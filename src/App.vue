@@ -1,31 +1,32 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from "vue";
 
-let background = ref('hot')
-let query = ref('London')
-let weatherData = ref(null)
+let background = ref("hot");
+let query = ref("London");
+let weatherData = ref(null);
 //http://api.weatherapi.com/v1/current.json?key=b3ecb471be1d47638db193536231706&q=london
-onMounted(() => fetchWeather())
+onMounted(() => fetchWeather());
 function getTemperatureStatus(temperature) {
   if (temperature > 30) {
-    return 'hot'
+    return "hot";
   } else if (temperature < 15) {
-    return 'cold'
+    return "cold";
   } else {
-    return 'normal'
+    return "normal";
   }
 }
 
 function fetchWeather() {
-  weatherData.value = null
+  weatherData.value = null;
   fetch(
     `http://api.weatherapi.com/v1/current.json?key=b3ecb471be1d47638db193536231706&q=${query.value}`
   )
     .then((res) => res.json())
     .then((data) => {
-      weatherData.value = data
-      background.value = getTemperatureStatus(data.current.temp_c)
-    })
+      weatherData.value = data;
+      background.value = getTemperatureStatus(data.current.temp_c);
+      console.log(data)
+    });
 }
 </script>
 
@@ -33,11 +34,16 @@ function fetchWeather() {
   <main :class="background">
     <div class="search-container">
       <input class="search transparent" v-model="query" placeholder="Enter City" />
-      <button @click.prevent="fetchWeather" class="search-button transparent">&gt;</button>
+      <button @click.prevent="fetchWeather" class="search-button transparent">
+        &gt;
+      </button>
     </div>
     <section id="temp-container" class="transparent" v-if="weatherData">
       <h1 id="temp-c">{{ weatherData.current.temp_c }} °c</h1>
-      <h3 id="condition">{{ weatherData.current.condition.text }}</h3>
+      <div id="condition-container">
+        <img :src="weatherData.current.condition.icon" />
+        <h3 id="condition">{{ weatherData.current.condition.text }}</h3>
+      </div>
     </section>
     <section v-else>Loading...</section>
   </main>
@@ -54,14 +60,14 @@ main {
   position: absolute;
   height: 100vh;
   width: 100vw;
-  padding: 20px;
+  padding-top: 20px;
   margin: 0px;
   display: flex;
   justify-content: start;
   flex-direction: column;
   align-items: center;
   color: white;
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background-size: cover;
 }
 
@@ -98,37 +104,63 @@ main {
   margin: 0px;
   font-size: 100px;
   color: white;
-  font-weight: boldier;
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-weight: bolder;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
 }
 
 #temp-container {
   border-radius: 25px;
   margin-top: 25px;
   padding: 50px;
+  width: 250px;
 }
 
-#condition {
-  
+#condition-container {
+  max-width: fit-content;
 }
+
+@media screen and (max-width: 450px) {
+  .search {
+    width: 220px;
+  }
+
+  #temp-container {
+    width: 220px;
+  }
+}
+
+@media screen and (max-width: 330px) {
+  .search {
+    width: 150px;
+  }
+
+  #temp-container {
+    width: 100px;
+  }
+
+  #temp-c {
+    font-size: 45px;
+  }
+}
+
 
 .cold {
-  background-image: url('@/assets/winter.jpg');
+  background-image: url("@/assets/winter.jpg");
 }
 
 .mid-cold {
-  background-image: url('@/assets/mid_cold.jpg');
+  background-image: url("@/assets/mid_cold.jpg");
 }
 
 .hot {
-  background-image: url('@/assets/hot.jpg');
+  background-image: url("@/assets/hot.jpg");
 }
 
 .mid-hot {
-  background-image: url('@/assets/mid_hot.jpg');
+  background-image: url("@/assets/mid_hot.jpg");
 }
 
 .normal {
-  background-image: url('@/assets/normal.jpg');
+  background-image: url("@/assets/normal.jpg");
 }
 </style>
